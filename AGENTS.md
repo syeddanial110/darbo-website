@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Cinematic intro lives in src/cinematic/ (config.ts lists all assets/scroll ranges; one rAF loop drives DOM, WebGL dissolve and canvas fx from a single GSAP-scrubbed progress value) — keeps assets swappable and scenes in sync.
+- The homepage opens with a full-screen video banner (src/components/HeroVideo.tsx, public/videos/hero.mp4 + hero-poster.jpg); the nav overlays it. Media paths live in src/cinematic/config.ts — keeps assets swappable.
 - Homepage portraits use the cinematic asset configuration rather than importing a separate portrait — keeps Darbo's likeness consistent throughout the site.
