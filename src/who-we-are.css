@@ -1,0 +1,51 @@
+/* "Who we are" page theme. Scoped to .wwa so the homepage tokens stay untouched. */
+.wwa {
+  --background: oklch(12% 0.015 265);
+  --foreground: oklch(98% 0 0);
+  --card: oklch(15% 0.02 265);
+  --primary: oklch(58% 0.22 262);
+  --primary-glow: oklch(78% 0.13 230);
+  --gold: oklch(82% 0.17 85);
+  --gold-glow: oklch(90% 0.15 95);
+  --gold-foreground: oklch(12% 0.015 265);
+  --muted: oklch(20% 0.025 265);
+  --muted-foreground: oklch(70% 0.02 255);
+  --border: oklch(100% 0 0 / 0.12);
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --gradient-blue: linear-gradient(90deg, var(--primary), var(--primary-glow));
+  --gradient-gold: linear-gradient(90deg, var(--gold), var(--gold-glow));
+  --fade-bottom: linear-gradient(to top, var(--background) 0%, color-mix(in oklab, var(--background) 70%, transparent) 30%, transparent 60%);
+  --fade-sides: linear-gradient(90deg, var(--background) 0%, transparent 22%, transparent 78%, var(--background) 100%);
+  font-family: var(--font-display);
+}
+
+.wwa .plate { position: absolute; inset: 0; overflow: hidden; }
+.wwa .plate-ext { position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover; filter: blur(40px) brightness(0.35) saturate(1.2); }
+.wwa .plate-img { position: absolute; top: 50%; left: 50%; height: 100svh; width: auto; max-width: none; transform: translate(-50%, -50%); filter: saturate(1.05) contrast(1.05); }
+@media (aspect-ratio <= 16/9) { .wwa .plate-img.wide { width: 100vw; height: auto; } }
+@media (aspect-ratio <= 1) { .wwa .plate-img.wide { width: 150vw; } }
+.wwa .plate-mask-sides { position: absolute; inset: 0; pointer-events: none; background: var(--fade-sides); }
+.wwa .plate-mask-bottom { position: absolute; inset: 0; pointer-events: none; background: var(--fade-bottom); }
+.wwa .grade { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color; background: color-mix(in oklab, var(--primary) 18%, transparent); }
+
+.wwa .grain { position: fixed; inset: -50%; z-index: 60; pointer-events: none; opacity: 0.08; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation: wwa-grain 1.2s steps(6, end) infinite; }
+.wwa .vignette { position: fixed; inset: 0; z-index: 59; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, color-mix(in oklab, var(--background) 85%, transparent) 100%); }
+.wwa .cursor { position: fixed; top: 0; left: 0; z-index: 70; width: 10px; height: 10px; border: 1px solid var(--primary-glow); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+@media (hover: none) { .wwa .cursor { display: none; } }
+
+/* @theme inline bakes JetBrains Mono into .font-mono, so re-point it at this page's mono face. */
+.wwa .font-mono { font-family: var(--font-mono); }
+.wwa .readout { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-foreground); }
+.wwa .headline { font-family: var(--font-display); font-weight: 800; font-stretch: 112%; line-height: 0.88; letter-spacing: -0.035em; text-transform: uppercase; }
+.wwa .text-gold-grad { background: var(--gradient-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wwa .text-blue-grad { background: var(--gradient-blue); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wwa .text-gold { color: var(--gold); }
+
+.wwa .btn-gold, .wwa .btn-line { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1.1rem 1.6rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.wwa .btn-gold { background: var(--gradient-gold); color: var(--gold-foreground); font-weight: 600; transition: transform 0.3s, box-shadow 0.3s; }
+.wwa .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -12px var(--gold); }
+.wwa .btn-line { border: 1px solid var(--border); color: var(--foreground); transition: border-color 0.3s, color 0.3s; }
+.wwa .btn-line:hover { border-color: var(--primary-glow); color: var(--primary-glow); }
+
+@keyframes wwa-grain { 0% { transform: translate(0) } 33% { transform: translate(-3%, 2%) } 66% { transform: translate(2%, -3%) } 100% { transform: translate(0) } }
+@media (prefers-reduced-motion: reduce) { .wwa .grain { animation: none; } }
