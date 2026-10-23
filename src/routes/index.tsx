@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeroVideo } from "@/components/HeroVideo";
 import { CINEMATIC_ASSETS } from "@/cinematic/config";
 
@@ -35,12 +35,14 @@ const ROWS = [
 
 function SiteHeader() {
   return (
-    <header className="flex items-center justify-between px-[6vw] py-8">
+    <header className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 px-[6vw] py-8">
       <span className="font-display text-xl font-black tracking-tight" style={{ fontStretch: "125%" }}>
         <span className="logo-lead">LeadZ</span><span className="logo-loco">Loco</span>
         <sup className="logo-tm">™</sup>
       </span>
-      <nav className="flex gap-8">
+      {/* Wraps under the logo on narrow phones instead of squeezing the links. */}
+      <nav className="flex gap-6 whitespace-nowrap md:gap-8">
+        <Link to="/who-we-are" className="eyebrow hover:text-foreground">Who we are</Link>
         <a href="#work" className="eyebrow hover:text-foreground">Approach</a>
         <a href="#contact" className="eyebrow hover:text-foreground">Contact</a>
       </nav>
