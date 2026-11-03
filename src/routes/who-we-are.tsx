@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { WHO_WE_ARE_ASSETS as A } from "@/cinematic/config";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/who-we-are")({
   head: () => ({
@@ -194,16 +195,7 @@ function WhoWeAre() {
       <div className="vignette" aria-hidden />
       <div ref={cursor} className="cursor" aria-hidden />
 
-      <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5 md:px-10">
-        <a href="/" className="headline text-xl" aria-label="LeadZLoco home">
-          LeadZ<span className="text-gold-grad">Loco</span>
-        </a>
-        <nav className="readout hidden gap-8 md:flex" aria-label="Main">
-          <a href="#voice" className="hover:text-foreground">Who we are</a>
-          <a href="#workforce" className="hover:text-foreground">What we build</a>
-          <a href="#contact" className="hover:text-foreground">Contact</a>
-        </nav>
-      </header>
+      <SiteHeader current="who-we-are" contactHref="#contact" />
 
       <main>
         <section id="voice" className="relative h-svh overflow-hidden" aria-label="We start with people">
