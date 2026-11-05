@@ -1,34 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  lazy,
-  Suspense,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
-  type MutableRefObject,
-  type ReactNode,
   type RefObject,
 } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { WHAT_WE_DO_ASSETS as A } from "@/cinematic/config";
+import { WHAT_WE_DO_ASSETS as A, WHAT_WE_DO_VIDEO } from "@/cinematic/config";
 import { SiteHeader } from "@/components/SiteHeader";
-import {
-  CHAPTERS,
-  CLOSING,
-  INTRO,
-  PIPELINE,
-  servicesFor,
-  TICKER,
-  type Service,
-} from "@/components/what-we-do/data";
+import { CHAPTERS, CLOSING, servicesFor, TICKER, type Service } from "@/components/what-we-do/data";
 import { ServiceIcon } from "@/components/what-we-do/Icons";
-
-// Three.js is heavy and client-only, so the scenes load on demand once a chapter nears the viewport.
-const ChapterScene = lazy(() => import("@/components/what-we-do/Scenes"));
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -38,7 +23,7 @@ const SITE_DESCRIPTION =
 export const Route = createFileRoute("/what-we-do")({
   head: () => ({
     meta: [
-      { title: "What We Do — LeadZLoco™" },
+      { title: `What We Do — LeadZLoco™` },
       {
         name: "description",
         content:
@@ -123,27 +108,6 @@ function useReducedMotion() {
   return reduced;
 }
 
-// Flips to true the first time the element comes within rootMargin of the viewport.
-function useNearViewport(ref: RefObject<HTMLElement | null>, rootMargin = "600px") {
-  const [near, setNear] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || near) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setNear(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, near, rootMargin]);
-  return near;
-}
-
 function scrollToId(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -151,131 +115,7 @@ function scrollToId(id: string) {
   else el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// ---- Header, chapter rail, footer -------------------------------------------------------------
-
-function ChapterRail({ reduced }: { reduced: boolean }) {
-  const [active, setActive] = useState(1);
-  const [open, setOpen] = useState(false);
-  const fill = useRef<HTMLDivElement>(null);
-  const root = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        fill.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: "none",
-          scrollTrigger: { trigger: root.current, start: "top 60%", end: "bottom 70%", scrub: 0.5 },
-        },
-      );
-    });
-    return () => ctx.revert();
-  }, [reduced]);
-
-  useEffect(() => {
-    const triggers = CHAPTERS.map((c, i) =>
-      ScrollTrigger.create({
-        trigger: `#chapter-${c.id}`,
-        start: "top 55%",
-        end: "bottom 55%",
-        onToggle: (self) => {
-          if (self.isActive) setActive(i + 1);
-        },
-      }),
-    );
-    return () => triggers.forEach((t) => t.kill());
-  }, []);
-
-  const go = (id: string) => {
-    setOpen(false);
-    scrollToId(id);
-  };
-
-  return (
-    <div
-      ref={root}
-      className="pointer-events-none fixed left-5 top-1/2 z-40 hidden -translate-y-1/2 md:block"
-    >
-      <div className="pointer-events-auto flex flex-col items-center gap-4">
-        <p className="font-ticker text-[0.55rem] tracking-[0.35em] text-muted-foreground">
-          CHAPTER
-        </p>
-        <div className="relative h-40 w-px bg-chrome/10">
-          <div
-            ref={fill}
-            aria-hidden
-            className="absolute inset-0 origin-top bg-gradient-to-b from-gold to-glow shadow-[0_0_10px_1px_var(--color-gold)]"
-          />
-          {CHAPTERS.map((c, i) => {
-            const isActive = active === c.id;
-            return (
-              <button
-                key={c.id}
-                onClick={() => go(`chapter-${c.id}`)}
-                aria-label={`Go to chapter ${c.label}: ${c.title}`}
-                aria-current={isActive ? "true" : undefined}
-                style={{ top: `${(i / (CHAPTERS.length - 1)) * 100}%` }}
-                className="absolute -left-3 flex h-7 w-7 -translate-y-1/2 items-center justify-center"
-              >
-                <span
-                  className={`h-2 w-2 rounded-full transition-all duration-500 ${isActive ? "scale-125 bg-gold shadow-[0_0_10px_2px_var(--color-gold)]" : "bg-chrome/25 hover:bg-glow"}`}
-                />
-                <span
-                  className={`absolute -left-1 whitespace-nowrap font-ticker text-[0.6rem] tracking-[0.25em] transition-all duration-500 ${isActive ? "-translate-x-8 text-gold" : "-translate-x-6 text-chrome/30"}`}
-                >
-                  {c.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <p
-          key={active}
-          className="max-w-[7rem] text-center font-display text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-chrome/80"
-        >
-          {CHAPTERS[active - 1]?.title}
-        </p>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="mt-4 rounded-full border border-border px-3 py-1 font-ticker text-[0.55rem] uppercase tracking-[0.25em] text-muted-foreground transition-colors hover:border-glow/50 hover:text-chrome"
-        >
-          Skip
-        </button>
-        {open && (
-          <div className="panel flex w-44 flex-col gap-1 p-3">
-            {CHAPTERS.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => go(`chapter-${c.id}`)}
-                className="rounded px-2 py-1.5 text-left font-display text-xs text-chrome/80 transition-colors hover:bg-midnight hover:text-gold"
-              >
-                <span className="mr-2 font-ticker text-muted-foreground">{c.label}</span>
-                {c.title}
-              </button>
-            ))}
-            <button
-              onClick={() => go("closing")}
-              className="rounded px-2 py-1.5 text-left font-display text-xs text-chrome/80 transition-colors hover:bg-midnight hover:text-gold"
-            >
-              <span className="mr-2 font-ticker text-muted-foreground">··</span>Closing
-            </button>
-            <button
-              onClick={() => go("cta")}
-              className="rounded px-2 py-1.5 text-left font-display text-xs text-chrome/80 transition-colors hover:bg-midnight hover:text-gold"
-            >
-              <span className="mr-2 font-ticker text-muted-foreground">→</span>Start the
-              conversation
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+// ---- Footer ----------------------------------------------------------------------------------
 
 function Footer() {
   const link = "text-chrome/80 transition-colors hover:text-gold";
@@ -405,27 +245,21 @@ function ScrollWords({
 
 function Hero({ reduced }: { reduced: boolean }) {
   const section = useRef<HTMLElement>(null);
-  const thread = useRef<HTMLDivElement>(null);
   const ticker = useRef<HTMLDivElement>(null);
   const cue = useRef<HTMLDivElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
+
+  // Reduced-motion visitors get a still frame instead of looping footage.
+  useEffect(() => {
+    const el = video.current;
+    if (!el) return;
+    if (reduced) el.pause();
+    else el.play().catch(() => {});
+  }, [reduced]);
 
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        thread.current,
-        { scaleX: 0 },
-        {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top top",
-            end: "center center",
-            scrub: 0.5,
-          },
-        },
-      );
       gsap.fromTo(
         ticker.current,
         { x: 0 },
@@ -457,31 +291,33 @@ function Hero({ reduced }: { reduced: boolean }) {
   return (
     <section ref={section} aria-labelledby="wwd-title" className="relative h-[190vh]">
       <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-5">
-        <div aria-hidden className="thread absolute top-24 left-0 h-0.5 w-full">
-          <div
-            ref={thread}
-            className="h-full w-full origin-left"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, var(--color-glow) 10%, var(--color-glow) 90%, transparent)",
-              transform: "scaleX(0)",
-            }}
-          />
-        </div>
-        <div className="max-w-4xl text-center">
-          <p className="ticker-caps text-glow">LeadZLoco · Services</p>
-          <h1
-            id="wwd-title"
-            className="mt-4 font-display text-5xl font-bold uppercase leading-[0.95] tracking-tight text-chrome text-glow md:text-8xl"
-          >
+        <video
+          ref={video}
+          className="absolute inset-0 h-full w-full object-cover"
+          src={WHAT_WE_DO_VIDEO.src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          tabIndex={-1}
+          disablePictureInPicture
+        />
+        {/* Light scrim keeps the header and bottom ticker legible over the footage. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, color-mix(in oklab, var(--color-space-black) 40%, transparent), color-mix(in oklab, var(--color-space-black) 15%, transparent) 40%, color-mix(in oklab, var(--color-space-black) 70%, transparent))",
+          }}
+        />
+        <div className="relative max-w-4xl text-center">
+          {/* Visually hidden: keeps the page's h1 for screen readers and SEO. */}
+          <h1 id="wwd-title" className="sr-only">
             What We Do
           </h1>
-          <ScrollWords
-            reduced={reduced}
-            trigger={section}
-            text={INTRO}
-            className="mx-auto mt-8 max-w-3xl text-balance text-lg leading-relaxed text-muted-foreground md:text-2xl"
-          />
         </div>
         <div aria-hidden className="absolute bottom-16 left-0 w-full overflow-hidden opacity-70">
           <div
@@ -511,7 +347,7 @@ function Hero({ reduced }: { reduced: boolean }) {
   );
 }
 
-// ---- Service cards and chapters --------------------------------------------------------------
+// ---- Service cards ----------------------------------------------------------------------------
 
 function ServiceCard({
   service,
@@ -564,291 +400,14 @@ function ServiceCard({
   );
 }
 
-// Cards dock in one by one as the pinned chapter scrolls; `progress` also drives the 3D scene.
-function useDockedCards(
-  section: RefObject<HTMLElement | null>,
-  progress: MutableRefObject<number>,
-  reduced: boolean,
-) {
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const root = section.current;
-    if (!root) return;
-    const mm = gsap.matchMedia();
-    mm.add("(min-width: 768px)", () => {
-      const cards = gsap.utils.toArray<HTMLElement>("[data-dock]", root);
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.7,
-          onUpdate: (self) => {
-            progress.current = self.progress;
-          },
-        },
-      });
-      cards.forEach((card, i) => {
-        tl.fromTo(
-          card,
-          { autoAlpha: 0, y: 56, rotateX: 6 },
-          { autoAlpha: 1, y: 0, rotateX: 0, duration: 1, ease: "power2.out" },
-          (i + 0.7) / (cards.length + 1.3),
-        );
-      });
-      return () => {
-        tl.scrollTrigger?.kill();
-        tl.kill();
-      };
-    });
-    mm.add("(max-width: 767px)", () => {
-      gsap.utils.toArray<HTMLElement>("[data-dock]", root).forEach((card) => {
-        gsap.fromTo(
-          card,
-          { autoAlpha: 0, y: 40 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: { trigger: card, start: "top 92%", end: "top 62%", scrub: true },
-          },
-        );
-      });
-      ScrollTrigger.create({
-        trigger: root,
-        start: "top bottom",
-        end: "bottom top",
-        onUpdate: (self) => {
-          progress.current = self.progress;
-        },
-      });
-    });
-    return () => mm.revert();
-  }, [reduced, progress, section]);
-}
-
-// Staggered placement of each chapter's cards inside the pinned stage. Exposed as custom properties so
-// they only take effect from md: up; on phones the cards stack at full width.
-const cardPos = (top: string, left: string | undefined, width: string) =>
-  ({ "--card-top": top, "--card-left": left, "--card-width": width }) as CSSProperties;
-
-const CARD_POSITIONS: Record<1 | 2 | 3, (i: number) => CSSProperties> = {
-  1: (i) => cardPos(`${5 + i * 19}%`, ["2%", "11%", "4%", "13%", "6%"][i], "min(27rem, 46vw)"),
-  2: (i) => cardPos(`${5 + i * 19}%`, i % 2 ? "15%" : "0%", "min(25rem, 44vw)"),
-  3: (i) =>
-    cardPos(
-      `${6 + i * 18.6}%`,
-      ["0%", "9%", "3%", "12%", "6%"][i],
-      i % 2 ? "min(23rem, 42vw)" : "min(27rem, 46vw)",
-    ),
-};
-
-function Thread({
-  section,
-  side,
-  reduced,
-}: {
-  section: RefObject<HTMLElement | null>;
-  side: "left" | "right";
-  reduced: boolean;
-}) {
-  const fill = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => {
-    if (reduced) {
-      if (fill.current) fill.current.style.transform = "scaleY(1)";
-      return;
-    }
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        fill.current,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top 80%",
-            end: "bottom 70%",
-            scrub: 0.6,
-          },
-        },
-      );
-    });
-    return () => ctx.revert();
-  }, [reduced, section]);
-
-  return (
-    <div
-      aria-hidden
-      className={`thread absolute inset-y-0 z-10 hidden w-0.5 md:block ${side === "left" ? "left-0" : "right-0"}`}
-    >
-      <div
-        ref={fill}
-        className="h-full w-full origin-top"
-        style={{
-          background:
-            "linear-gradient(180deg, transparent, var(--color-glow) 12%, var(--color-glow) 88%, transparent)",
-          transform: "scaleY(0)",
-        }}
-      />
-    </div>
-  );
-}
-
-function Chapter({
-  id,
-  reduced,
-  stageSide,
-  stageOverlay,
-}: {
-  id: 1 | 2 | 3;
-  reduced: boolean;
-  stageSide: "left" | "right";
-  stageOverlay?: ReactNode;
-}) {
-  const chapter = CHAPTERS.find((c) => c.id === id)!;
-  const services = servicesFor(id);
-  const section = useRef<HTMLElement>(null);
-  const progress = useRef(0);
-  useDockedCards(section, progress, reduced);
-  const near = useNearViewport(section);
-
-  return (
-    <section
-      id={`chapter-${id}`}
-      ref={section}
-      aria-labelledby={`chapter-${id}-title`}
-      className="relative md:h-[520vh]"
-    >
-      <Thread section={section} side={stageSide} reduced={reduced} />
-      <div className="relative flex flex-col md:sticky md:top-0 md:h-screen md:flex-row md:overflow-hidden">
-        <div
-          className={`relative h-[38vh] md:h-full md:w-[55%] ${stageSide === "left" ? "md:order-1" : "md:order-2"}`}
-        >
-          {near && (
-            <Suspense fallback={null}>
-              <ChapterScene
-                id={id}
-                progress={progress}
-                reduced={reduced}
-                className="absolute inset-0"
-              />
-            </Suspense>
-          )}
-          <div className="absolute bottom-4 left-5 max-w-xs md:bottom-10 md:left-12">
-            <p className="ticker-caps text-gold">
-              {chapter.label} · {chapter.kicker}
-            </p>
-            <h2
-              id={`chapter-${id}-title`}
-              className="mt-2 font-display text-3xl font-bold uppercase leading-none text-chrome text-glow md:text-5xl"
-            >
-              The {chapter.title.split(" ")[1]}
-            </h2>
-          </div>
-          {stageOverlay}
-        </div>
-        <div
-          className={`relative z-10 flex-1 bg-gradient-to-b from-space-black/90 via-space-black/95 to-space-black md:bg-transparent ${stageSide === "left" ? "md:order-2" : "md:order-1"}`}
-        >
-          <div className="flex flex-col gap-6 px-5 pb-16 pt-10 md:absolute md:inset-0 md:p-0">
-            {services.map((s, i) => (
-              <ServiceCard
-                key={s.title}
-                service={s}
-                index={i}
-                className="md:absolute md:top-(--card-top) md:left-(--card-left) md:w-(--card-width)"
-                style={CARD_POSITIONS[id](i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---- Chapter 4 and the proof-of-scale reveal ---------------------------------------------------
-
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+// ---- Proof-of-scale reveal ---------------------------------------------------------------------
 
 function Scale({ reduced }: { reduced: boolean }) {
   const services = servicesFor(4);
-  const cards = services.slice(0, 4);
   const proof = services[4]!;
-  const chapter = useRef<HTMLElement>(null);
   const reveal = useRef<HTMLElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const labels = useRef<(HTMLSpanElement | null)[]>([]);
   const hall = useRef<HTMLImageElement>(null);
   const skyline = useRef<HTMLImageElement>(null);
-
-  // Pipeline marker and the four cards.
-  useLayoutEffect(() => {
-    if (reduced) {
-      if (dotRef.current) dotRef.current.style.left = "100%";
-      labels.current.forEach((l) => l?.classList.add("text-gold"));
-      return;
-    }
-    const mm = gsap.matchMedia();
-    mm.add("(min-width: 768px)", () => {
-      const root = chapter.current!;
-      const docks = gsap.utils.toArray<HTMLElement>("[data-dock]", root);
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.7,
-          onUpdate: (self) => {
-            const p = self.progress;
-            if (dotRef.current) dotRef.current.style.left = `${clamp01(p / 0.45) * 100}%`;
-            labels.current.forEach((l, i) => {
-              const lit = (1 / 0.45) * p * 1.05 >= i / (PIPELINE.length - 1);
-              l?.classList.toggle("text-gold", lit);
-              l?.classList.toggle("text-chrome/30", !lit);
-            });
-          },
-        },
-      });
-      docks.forEach((d, i) => {
-        tl.fromTo(
-          d,
-          { autoAlpha: 0, y: 56 },
-          { autoAlpha: 1, y: 0, duration: 1, ease: "power2.out" },
-          0.5 + i * 0.12,
-        );
-      });
-      tl.to({}, { duration: 0.5 });
-      return () => {
-        tl.scrollTrigger?.kill();
-        tl.kill();
-      };
-    });
-    mm.add("(max-width: 767px)", () => {
-      ScrollTrigger.create({
-        trigger: chapter.current,
-        start: "top bottom",
-        end: "bottom top",
-        onUpdate: (self) => {
-          if (dotRef.current) dotRef.current.style.left = `${clamp01(self.progress / 0.6) * 100}%`;
-        },
-      });
-      gsap.utils.toArray<HTMLElement>("[data-dock]", chapter.current!).forEach((d) => {
-        gsap.fromTo(
-          d,
-          { autoAlpha: 0, y: 40 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: { trigger: d, start: "top 92%", end: "top 62%", scrub: true },
-          },
-        );
-      });
-    });
-    return () => mm.revert();
-  }, [reduced]);
 
   // Workforce hall zooms out and dissolves into the skyline.
   useLayoutEffect(() => {
@@ -898,68 +457,6 @@ function Scale({ reduced }: { reduced: boolean }) {
 
   return (
     <>
-      <section
-        id="chapter-4"
-        ref={chapter}
-        aria-labelledby="chapter-4-title"
-        className="relative md:h-[460vh]"
-      >
-        <div className="md:sticky md:top-0 md:flex md:h-screen md:flex-col md:justify-center md:overflow-hidden">
-          <div className="relative px-5 pt-20 md:px-16 md:pt-8">
-            <p className="ticker-caps text-gold">04 · Workforce, operations, infrastructure</p>
-            <h2
-              id="chapter-4-title"
-              className="mt-2 font-display text-3xl font-bold uppercase leading-none text-chrome text-glow md:text-5xl"
-            >
-              The Scale
-            </h2>
-            <div
-              className="relative mt-8 md:mt-12"
-              role="img"
-              aria-label={`Pipeline: ${PIPELINE.join(", ")}`}
-            >
-              <div
-                aria-hidden
-                className="h-px w-full bg-gradient-to-r from-glow/10 via-glow/60 to-glow/10 md:h-0.5"
-              />
-              <div
-                ref={dotRef}
-                aria-hidden
-                className="absolute -top-[7px] h-3 w-3 -translate-x-1/2 rounded-full bg-gold shadow-[0_0_16px_4px_var(--color-gold)] transition-none"
-                style={{ left: "0%" }}
-              />
-              <div className="mt-3 flex justify-between">
-                {PIPELINE.map((label, i) => (
-                  <span
-                    key={label}
-                    ref={(el) => {
-                      labels.current[i] = el;
-                    }}
-                    className={`font-ticker text-[0.5rem] tracking-[0.15em] uppercase md:text-[0.65rem] md:tracking-[0.22em] ${reduced ? "text-gold" : "text-chrome/30"}`}
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="mt-10 grid gap-5 px-5 pb-16 md:mt-14 md:grid-cols-12 md:gap-6 md:px-16 md:pb-0">
-            <div className="md:col-span-5 md:[margin-top:2rem]">
-              <ServiceCard service={cards[0]!} index={0} />
-            </div>
-            <div className="md:col-span-4">
-              <ServiceCard service={cards[1]!} index={1} />
-            </div>
-            <div className="md:col-span-3 md:[margin-top:3rem]">
-              <ServiceCard service={cards[2]!} index={2} />
-            </div>
-            <div className="md:col-span-6 md:[margin-top:-1rem]">
-              <ServiceCard service={cards[3]!} index={3} />
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section
         ref={reveal}
         className="relative md:h-[340vh]"
@@ -1250,36 +747,8 @@ function WhatWeDo() {
   return (
     <div className="wwd">
       <SiteHeader current="what-we-do" contactHref="#cta" />
-      <ChapterRail reduced={reduced} />
       <main>
         <Hero reduced={reduced} />
-        <Chapter id={1} reduced={reduced} stageSide="left" />
-        <Chapter
-          id={2}
-          reduced={reduced}
-          stageSide="right"
-          stageOverlay={
-            <p
-              aria-hidden
-              className="absolute right-4 top-4 hidden font-ticker text-[0.55rem] tracking-[0.3em] text-chrome/40 md:right-8 md:top-8 md:block"
-            >
-              DISCOVERY → QUALIFICATION → PIPELINE → RECOVERY
-            </p>
-          }
-        />
-        <Chapter
-          id={3}
-          reduced={reduced}
-          stageSide="left"
-          stageOverlay={
-            <p
-              aria-hidden
-              className="absolute left-1/2 top-4 hidden -translate-x-1/2 font-ticker text-[0.55rem] tracking-[0.3em] text-chrome/40 md:top-8 md:block"
-            >
-              TEXT · EMAIL · WEB CHAT · SOCIAL · VOICE
-            </p>
-          }
-        />
         <Scale reduced={reduced} />
         <Closing reduced={reduced} />
         <Contact />

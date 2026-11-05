@@ -30,6 +30,15 @@ export const WHAT_WE_DO_ASSETS = {
   darbo: wwdDarbo,
 };
 
+// The file names contain spaces, so the URL is percent-encoded.
+export const WHAT_WE_DO_VIDEO = {
+  src: "/videos/what%20we%20do%20banner%20video.mp4",
+};
+
+export const WHO_WE_ARE_VIDEO = {
+  src: "/videos/who%20we%20are%20banner%20video.mp4",
+};
+
 export const HERO_VIDEO = {
   src: "/videos/hero.mp4",
   poster: "/videos/hero-poster.jpg",
