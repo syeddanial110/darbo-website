@@ -2,6 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 @import "./who-we-are.css";
+@import "./what-we-do.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -132,3 +133,40 @@
 }
 
 @media (prefers-reduced-motion: reduce) { .hero-video video, .hero-sound { display: none; } }
+
+/* Shared header (src/components/SiteHeader.tsx). Self-contained so it looks identical on every page,
+   whichever page theme (.wwa / .wwd / default) it sits inside. */
+.site-header {
+  --sh-muted: oklch(70% 0.02 255);
+  --sh-fg: oklch(98% 0 0);
+  --sh-gold: linear-gradient(90deg, oklch(82% 0.17 85), oklch(90% 0.15 95));
+  color: var(--sh-fg);
+}
+.site-header-logo {
+  font-family: "Archivo", system-ui, sans-serif;
+  font-weight: 800;
+  font-stretch: 112%;
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+.site-header-gold {
+  background: var(--sh-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.site-header-nav {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sh-muted);
+}
+.site-header-nav a {
+  transition: color 0.2s;
+}
+.site-header-nav a:hover,
+.site-header-nav a[aria-current="page"] {
+  color: var(--sh-fg);
+}

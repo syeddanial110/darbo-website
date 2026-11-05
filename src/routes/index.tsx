@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/SiteHeader";
 import { HeroVideo } from "@/components/HeroVideo";
 import { CINEMATIC_ASSETS } from "@/cinematic/config";
 
@@ -20,7 +21,7 @@ function Index() {
   return (
     <main className="bg-stage">
       <HeroVideo>
-        <SiteHeader />
+        <SiteHeader current="home" contactHref="#contact" />
       </HeroVideo>
       <Home />
     </main>
@@ -32,23 +33,6 @@ const ROWS = [
   { n: "02", t: "Headless by design", d: "Your front end stays yours. Intelligence plugs in underneath, ready to scale." },
   { n: "03", t: "Built around people", d: "Technology evolves. The vision, the judgement and the relationships stay human." },
 ];
-
-function SiteHeader() {
-  return (
-    <header className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 px-[6vw] py-8">
-      <span className="font-display text-xl font-black tracking-tight" style={{ fontStretch: "125%" }}>
-        <span className="logo-lead">LeadZ</span><span className="logo-loco">Loco</span>
-        <sup className="logo-tm">™</sup>
-      </span>
-      {/* Wraps under the logo on narrow phones instead of squeezing the links. */}
-      <nav className="flex gap-6 whitespace-nowrap md:gap-8">
-        <Link to="/who-we-are" className="eyebrow hover:text-foreground">Who we are</Link>
-        <a href="#work" className="eyebrow hover:text-foreground">Approach</a>
-        <a href="#contact" className="eyebrow hover:text-foreground">Contact</a>
-      </nav>
-    </header>
-  );
-}
 
 function Home() {
   return (

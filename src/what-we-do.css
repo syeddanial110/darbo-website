@@ -1,0 +1,216 @@
+/* "What we do" page theme. Scoped to .wwd so the homepage and Who We Are tokens stay untouched. */
+@theme inline {
+  --color-space-black: var(--space-black);
+  --color-midnight: var(--midnight-navy);
+  --color-cobalt: var(--electric-cobalt);
+  --color-glow: var(--glow-blue);
+  --color-chrome: var(--chrome-white);
+  --font-ticker: "IBM Plex Mono", ui-monospace, monospace;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.wwd {
+  --radius: 0.625rem;
+  --space-black: oklch(14.5% 0.02 262);
+  --midnight-navy: oklch(21.5% 0.05 264);
+  --midnight-deep: oklch(17.5% 0.038 264);
+  --electric-cobalt: oklch(58% 0.21 262);
+  --glow-blue: oklch(78% 0.11 232);
+  --chrome-white: oklch(97% 0.005 240);
+  --signature-gold: oklch(82% 0.135 85);
+  --signal-red: oklch(62% 0.23 27);
+
+  /* @theme inline does not emit the --color-* variables, but arbitrary values reference them. */
+  --color-gold: var(--signature-gold);
+  --color-glow: var(--glow-blue);
+  --color-cobalt: var(--electric-cobalt);
+  --color-chrome: var(--chrome-white);
+  --color-space-black: var(--space-black);
+
+  --background: var(--space-black);
+  --foreground: var(--chrome-white);
+  --gold: var(--signature-gold);
+  --muted-foreground: oklch(72% 0.045 250);
+  --border: oklch(100% 0 0 / 0.1);
+  --input: oklch(100% 0 0 / 0.14);
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-ticker: "IBM Plex Mono", ui-monospace, monospace;
+
+  --thread-glow: 0 0 12px 1px color-mix(in oklab, var(--glow-blue) 70%, transparent);
+  --card-glow:
+    0 0 0 1px color-mix(in oklab, var(--glow-blue) 25%, transparent),
+    0 18px 60px -18px color-mix(in oklab, var(--electric-cobalt) 45%, transparent);
+  --gold-glow: 0 0 24px -6px color-mix(in oklab, var(--signature-gold) 70%, transparent);
+
+  position: relative;
+  background-color: var(--space-black);
+  color: var(--chrome-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base layer so Tailwind utilities (tracking-tight, font-display) still win over it. */
+@layer base {
+  .wwd h1,
+  .wwd h2,
+  .wwd h3,
+  .wwd h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+.wwd ::selection {
+  background: var(--electric-cobalt);
+  color: var(--chrome-white);
+}
+.wwd .rounded-lg {
+  border-radius: var(--radius);
+}
+
+.wwd .ticker-caps {
+  font-family: var(--font-ticker);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.68rem;
+}
+.wwd .text-glow {
+  text-shadow:
+    0 0 18px color-mix(in oklab, var(--glow-blue) 45%, transparent),
+    0 0 42px color-mix(in oklab, var(--electric-cobalt) 30%, transparent);
+}
+.wwd .text-glow-gold {
+  text-shadow: 0 0 22px color-mix(in oklab, var(--signature-gold) 55%, transparent);
+}
+.wwd .thread {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--glow-blue) 80%, transparent))
+    drop-shadow(0 0 18px color-mix(in oklab, var(--electric-cobalt) 45%, transparent));
+}
+
+.wwd .panel {
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--midnight-navy) 85%, transparent),
+    color-mix(in oklab, var(--midnight-deep) 92%, transparent)
+  );
+  border: 1px solid color-mix(in oklab, var(--glow-blue) 16%, transparent);
+  border-radius: calc(var(--radius) + 8px);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.wwd .panel-hover {
+  transition:
+    border-color 0.4s,
+    box-shadow 0.4s,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wwd .panel-hover:hover,
+.wwd .panel-hover:focus-visible {
+  border-color: color-mix(in oklab, var(--signature-gold) 45%, transparent);
+  box-shadow: var(--gold-glow);
+  transform: translateY(-4px);
+}
+
+/* Chromatic fringe: cobalt on the left edge, red on the right, fading in on hover. */
+.wwd .chromatic::before,
+.wwd .chromatic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.wwd .chromatic::before {
+  box-shadow: inset 3px 0 12px -6px var(--electric-cobalt);
+}
+.wwd .chromatic::after {
+  box-shadow: inset -3px 0 12px -6px color-mix(in oklab, var(--signal-red) 80%, transparent);
+}
+.wwd .chromatic:hover::before,
+.wwd .chromatic:hover::after {
+  opacity: 0.55;
+}
+
+.wwd .gold-button,
+.wwd .ghost-button {
+  font-family: var(--font-display);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.6rem;
+  cursor: pointer;
+}
+.wwd .gold-button {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--signature-gold) 92%, white),
+    var(--signature-gold)
+  );
+  color: oklch(20% 0.05 85);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: var(--gold-glow);
+  transition:
+    filter 0.3s,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.wwd .gold-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+.wwd .ghost-button {
+  border: 1px solid color-mix(in oklab, var(--glow-blue) 40%, transparent);
+  color: var(--chrome-white);
+  font-weight: 500;
+  background: transparent;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
+}
+.wwd .ghost-button:hover {
+  background: color-mix(in oklab, var(--midnight-navy) 70%, transparent);
+  border-color: var(--glow-blue);
+}
+
+.wwd .grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: wwd-grain 1.2s steps(3, end) infinite;
+}
+@keyframes wwd-grain {
+  0% {
+    transform: translate(0);
+  }
+  33% {
+    transform: translate(-2%, 1.4%);
+  }
+  66% {
+    transform: translate(1.6%, -1%);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wwd .grain {
+    animation: none;
+  }
+}
+
+/* Lenis smooth-scroll base rules. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
