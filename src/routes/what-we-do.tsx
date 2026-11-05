@@ -12,7 +12,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { WHAT_WE_DO_ASSETS as A, WHAT_WE_DO_VIDEO } from "@/cinematic/config";
 import { SiteHeader } from "@/components/SiteHeader";
-import { CHAPTERS, CLOSING, servicesFor, TICKER, type Service } from "@/components/what-we-do/data";
+import { CHAPTERS, CLOSING, servicesFor, type Service } from "@/components/what-we-do/data";
 import { ServiceIcon } from "@/components/what-we-do/Icons";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
@@ -245,7 +245,6 @@ function ScrollWords({
 
 function Hero({ reduced }: { reduced: boolean }) {
   const section = useRef<HTMLElement>(null);
-  const ticker = useRef<HTMLDivElement>(null);
   const cue = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
 
@@ -260,20 +259,6 @@ function Hero({ reduced }: { reduced: boolean }) {
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ticker.current,
-        { x: 0 },
-        {
-          x: "-12%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.5,
-          },
-        },
-      );
       gsap.to(cue.current, {
         autoAlpha: 0,
         y: -20,
@@ -304,7 +289,7 @@ function Hero({ reduced }: { reduced: boolean }) {
           tabIndex={-1}
           disablePictureInPicture
         />
-        {/* Light scrim keeps the header and bottom ticker legible over the footage. */}
+        {/* Light scrim keeps the header and scroll cue legible over the footage. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -318,14 +303,6 @@ function Hero({ reduced }: { reduced: boolean }) {
           <h1 id="wwd-title" className="sr-only">
             What We Do
           </h1>
-        </div>
-        <div aria-hidden className="absolute bottom-16 left-0 w-full overflow-hidden opacity-70">
-          <div
-            ref={ticker}
-            className="whitespace-nowrap ticker-caps text-chrome/60 will-change-transform"
-          >
-            <span>{TICKER.repeat(3)}</span>
-          </div>
         </div>
         <div
           ref={cue}
