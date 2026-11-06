@@ -39,6 +39,11 @@ export const WHO_WE_ARE_VIDEO = {
   src: "/videos/who%20we%20are%20banner%20video.mp4",
 };
 
+// Portrait clip (720x1280) that replaces the founder photo in the homepage intro section.
+export const ABOUT_VIDEO = {
+  src: "/videos/about-vid.mp4",
+};
+
 export const HERO_VIDEO = {
   src: "/videos/hero.mp4",
   poster: "/videos/hero-poster.jpg",

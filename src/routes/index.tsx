@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroVideo } from "@/components/HeroVideo";
-import { CINEMATIC_ASSETS } from "@/cinematic/config";
+import { ABOUT_VIDEO } from "@/cinematic/config";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,18 +35,45 @@ const ROWS = [
   { n: "03", t: "Built around people", d: "Technology evolves. The vision, the judgement and the relationships stay human." },
 ];
 
+// Looping muted clip (autoplay needs muted). Reduced-motion visitors get a paused first frame.
+function AboutVideo() {
+  const video = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const el = video.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) el.pause();
+    else el.play().catch(() => {});
+  }, []);
+  return (
+    <video
+      ref={video}
+      src={ABOUT_VIDEO.src}
+      aria-label="Darbo, founder of LeadZLoco"
+      width={720}
+      height={1280}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      disablePictureInPicture
+      className="relative ml-auto aspect-[9/16] w-full max-w-md object-cover mix-blend-screen"
+    />
+  );
+}
+
 function Home() {
   return (
     <div id="home" className="relative bg-stage text-foreground">
       <section className="grid items-end gap-10 px-[6vw] pb-24 pt-10 md:grid-cols-12">
-        <div className="md:col-span-7">
+        <div className="relative z-10 md:col-span-7">
           <p className="eyebrow mb-6">Architect of Headless Agentic AI Systems</p>
           <h1 className="title-card max-w-none">Building businesses that scale without limits.</h1>
           <a href="#contact" className="hud-btn mt-10 inline-block">Start the conversation</a>
         </div>
         <div className="relative md:col-span-5">
           <div className="cine-rim absolute inset-0" />
-          <img src={CINEMATIC_ASSETS.darboHuman} alt="Darbo, founder of LeadZLoco" width={896} height={1200} loading="lazy" className="relative ml-auto w-full max-w-md" />
+          <AboutVideo />
         </div>
       </section>
 
