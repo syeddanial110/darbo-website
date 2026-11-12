@@ -83,6 +83,13 @@ function WhoWeAre() {
           .to("#human [data-mesh]", { clipPath: "circle(10% at 38% 30%)", opacity: 0.3, duration: 0.5, ease: "sine.inOut" }, 0.5)
           .fromTo("#human [data-beat]", { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.22, duration: 0.18 }, 0.1);
 
+        // Plain parallax for the "Let's build" background: the oversized layer slides against the scroll.
+        gsap.fromTo(
+          "#build [data-par]",
+          { yPercent: -17 },
+          { yPercent: 17, ease: "none", scrollTrigger: { trigger: "#build", start: "top bottom", end: "bottom top", scrub: true } },
+        );
+
         gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) =>
           gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1.1, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 88%" } }),
         );
@@ -169,12 +176,14 @@ function WhoWeAre() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden px-6 py-[22vh] md:px-10" aria-label="Let's build">
-          <img src={A.stage.src} alt="" aria-hidden loading="lazy" className="absolute inset-0 h-full w-full object-contain opacity-10 blur-sm" />
+        <section id="build" className="relative overflow-hidden px-6 py-[22vh] md:px-10" aria-label="Let's build">
+          <div data-par aria-hidden className="absolute inset-x-0 -bottom-[30%] -top-[30%] will-change-transform">
+            <img src={A.build.src} alt="" loading="lazy" className="h-full w-full object-cover" />
+          </div>
           <div
             aria-hidden
-            className="absolute -left-1/4 top-0 h-full w-1/2 animate-pulse opacity-20"
-            style={{ background: "radial-gradient(closest-side, var(--primary), transparent)", animationDuration: "9s" }}
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(90deg, color-mix(in oklab, var(--background) 88%, transparent) 0%, color-mix(in oklab, var(--background) 55%, transparent) 55%, color-mix(in oklab, var(--background) 25%, transparent) 100%)" }}
           />
           <div className="relative max-w-4xl">
             <h2 data-reveal className="headline text-[clamp(2.4rem,7vw,6rem)]">

@@ -5,6 +5,7 @@ import wwaCallcenter from "@/assets/who-we-are/robot-callcenter.jpg";
 import wwaHandoff from "@/assets/who-we-are/robots-handoff.jpg";
 import wwaPortrait from "@/assets/who-we-are/darbo-portrait.jpg";
 import wwaCommand from "@/assets/who-we-are/command-center.jpg";
+import wwaBuild from "@/assets/who-we-are/build.jpg";
 import wwdHall from "@/assets/what-we-do/workforce-hall.jpg";
 import wwdSkyline from "@/assets/what-we-do/skyline.jpg";
 import wwdDarbo from "@/assets/what-we-do/darbo.png";
@@ -23,6 +24,7 @@ export const WHO_WE_ARE_ASSETS = {
   handoff: { src: wwaHandoff, aspect: 4 / 3, focal: "55% 45%", maxScale: 1.06 },
   portrait: { src: wwaPortrait, aspect: 1, focal: "48% 35%", maxScale: 1.06 },
   command: { src: wwaCommand, aspect: 1152 / 928, focal: "50% 40%", maxScale: 1.05 },
+  build: { src: wwaBuild },
   parallaxMax: 3.5,
 };
 
