@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroVideo } from "@/components/HeroVideo";
-import { ABOUT_VIDEO } from "@/cinematic/config";
+import { ABOUT_VIDEO, WORK_IMAGES } from "@/cinematic/config";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,13 +32,14 @@ function Index() {
 }
 
 const ROWS = [
-  { n: "01", t: "Systems that think ahead", d: "Agentic architecture that works quietly behind your brand — wherever your customers are." },
-  { n: "02", t: "Headless by design", d: "Your front end stays yours. Intelligence plugs in underneath, ready to scale." },
-  { n: "03", t: "Built around people", d: "Technology evolves. The vision, the judgement and the relationships stay human." },
+  { n: "01", t: "Systems that think ahead", d: "Agentic architecture that works quietly behind your brand — wherever your customers are.", img: WORK_IMAGES.think, cta: "See what we build", href: "/what-we-do" },
+  { n: "02", t: "Headless by design", d: "Your front end stays yours. Intelligence plugs in underneath, ready to scale.", img: WORK_IMAGES.headless, cta: "How it works", href: "/what-we-do" },
+  { n: "03", t: "Built around people", d: "Technology evolves. The vision, the judgement and the relationships stay human.", img: WORK_IMAGES.people, cta: "Meet the team", href: "/who-we-are" },
 ];
 
-// Scroll-driven "approach" rows: masked word reveals, drawn dividers, parallax numerals and a focus
-// state that keeps the row nearest the viewport centre lit. Static (fully visible) under reduced motion.
+// Full-bleed photo panels: the background drifts and settles (parallax + scale) as each panel scrolls
+// through, the heading rises out of a mask word by word, the copy and button fade in over a dark tint.
+// Static (fully visible) under reduced motion.
 function WorkRows() {
   const root = useRef<HTMLDivElement>(null);
 
@@ -49,37 +50,30 @@ function WorkRows() {
     const mm = gsap.matchMedia();
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const ctx = gsap.context(() => {
-        gsap.utils.toArray<HTMLElement>("[data-row]").forEach((row, i) => {
-          const dir = i % 2 ? 1 : -1;
+        gsap.utils.toArray<HTMLElement>("[data-row]").forEach((row) => {
           const q = (s: string) => row.querySelectorAll(s);
 
-          gsap
-            .timeline({ scrollTrigger: { trigger: row, start: "top 88%", end: "top 38%", scrub: 0.7 } })
-            .fromTo(q("[data-line]"), { scaleX: 0 }, { scaleX: 1, ease: "none", duration: 1 }, 0)
-            .fromTo(q("[data-num]"), { autoAlpha: 0, x: 24 * dir }, { autoAlpha: 1, x: 0, ease: "power2.out", duration: 0.5 }, 0.05)
-            .fromTo(
-              q("[data-word]"),
-              { yPercent: 118, rotate: 5 * -dir },
-              { yPercent: 0, rotate: 0, ease: "power3.out", stagger: 0.14, duration: 0.7 },
-              0.1,
-            )
-            .fromTo(q("[data-desc]"), { autoAlpha: 0, y: 28, filter: "blur(10px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", ease: "power2.out", duration: 0.6 }, 0.4);
-
+          // Background: plain parallax (no scaling); the layer is oversized so edges never show.
           gsap.fromTo(
-            q("[data-ghost]"),
-            { yPercent: -22 },
-            { yPercent: 22, ease: "none", scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true } },
+            q("[data-bg]"),
+            { yPercent: -21 },
+            { yPercent: 21, ease: "none", scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true } },
           );
 
-          ScrollTrigger.create({
-            trigger: row,
-            start: "top 62%",
-            end: "bottom 38%",
-            onToggle: (self) => {
-              row.classList.toggle("is-active", self.isActive);
-              gsap.to(q("[data-focus]"), { opacity: self.isActive ? 1 : 0.32, duration: 0.6, ease: "power2.out", overwrite: true });
-            },
-          });
+          // Foreground copy: staged reveal as the panel reaches the middle of the screen.
+          gsap
+            .timeline({ scrollTrigger: { trigger: row, start: "top 75%", end: "top 20%", scrub: 0.7 } })
+            .fromTo(q("[data-num]"), { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.4 }, 0)
+            .fromTo(q("[data-word]"), { yPercent: 118, rotate: 4 }, { yPercent: 0, rotate: 0, ease: "power3.out", stagger: 0.12, duration: 0.7 }, 0.05)
+            .fromTo(q("[data-desc]"), { autoAlpha: 0, y: 26, filter: "blur(10px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", ease: "power2.out", duration: 0.6 }, 0.35)
+            .fromTo(q("[data-btn]"), { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, ease: "power2.out", duration: 0.5 }, 0.55);
+
+          // Content leaves a little faster than the photo for depth.
+          gsap.fromTo(
+            q("[data-content]"),
+            { yPercent: 6 },
+            { yPercent: -6, ease: "none", scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true } },
+          );
         });
       }, el);
       return () => ctx.revert();
@@ -89,40 +83,26 @@ function WorkRows() {
 
   return (
     <div ref={root}>
-      {ROWS.map((r, i) => {
-        const odd = i % 2 === 1;
-        return (
-          <div key={r.n} data-row className="group relative overflow-hidden border-b border-border py-12 md:py-16">
-            <span
-              data-ghost
-              aria-hidden
-              className={`pointer-events-none absolute top-1/2 -translate-y-1/2 select-none font-black leading-none ${odd ? "right-0" : "left-0"}`}
-              style={{ fontSize: "clamp(8rem, 22vw, 20rem)", fontStretch: "125%", color: "transparent", WebkitTextStroke: "1px oklch(1 0 0 / 0.14)" }}
-            >
-              {r.n}
-            </span>
-            <div data-focus className={`relative grid gap-6 md:grid-cols-12 ${odd ? "md:text-right" : ""}`}>
-              <span data-num className={`eyebrow transition-colors duration-500 group-[.is-active]:text-gold md:col-span-2 ${odd ? "md:order-last" : ""}`}>
-                {r.n}
-              </span>
-              <h3 className={`flex flex-wrap gap-x-[0.28em] text-3xl font-bold md:col-span-6 md:text-5xl ${odd ? "md:justify-end" : ""}`} style={{ fontStretch: "115%" }}>
-                {r.t.split(" ").map((w, k) => (
-                  <span key={k} className="-mb-[0.15em] inline-block overflow-hidden pb-[0.15em] align-top">
-                    <span data-word className="inline-block will-change-transform">{w}</span>
-                  </span>
-                ))}
-              </h3>
-              <p data-desc className="text-muted-foreground md:col-span-4">{r.d}</p>
-            </div>
-            <div
-              data-line
-              aria-hidden
-              className={`absolute inset-x-0 bottom-0 h-px ${odd ? "origin-right" : "origin-left"}`}
-              style={{ background: `linear-gradient(${odd ? "270deg" : "90deg"}, var(--primary), color-mix(in oklab, var(--primary) 30%, transparent) 55%, transparent)` }}
-            />
+      {ROWS.map((r) => (
+        <div key={r.n} data-row className="relative flex min-h-[85svh] items-center justify-center overflow-hidden border-b border-border">
+          <div data-bg aria-hidden className="absolute inset-x-0 -bottom-[40%] -top-[40%] will-change-transform">
+            <img src={r.img} alt="" loading="lazy" className="h-full w-full object-cover" />
           </div>
-        );
-      })}
+          <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.38) 45%, rgb(0 0 0 / 0.7))" }} />
+          <div data-content className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-[6vw] text-center">
+            <span data-num className="eyebrow mb-5 text-gold">{r.n}</span>
+            <h3 className="flex flex-wrap justify-center gap-x-[0.28em] text-4xl font-bold md:text-7xl" style={{ fontStretch: "115%" }}>
+              {r.t.split(" ").map((w, k) => (
+                <span key={k} className="-mb-[0.15em] inline-block overflow-hidden pb-[0.15em] align-top">
+                  <span data-word className="inline-block will-change-transform">{w}</span>
+                </span>
+              ))}
+            </h3>
+            <p data-desc className="mt-6 max-w-xl text-lg text-white/80">{r.d}</p>
+            <a data-btn href={r.href} className="hud-btn mt-10 inline-block">{r.cta} →</a>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -282,7 +262,7 @@ function Home() {
         </div>
       </section>
 
-      <section id="work" className="border-t border-border px-[6vw] py-24">
+      <section id="work" className="border-t border-border">
         <WorkRows />
       </section>
 

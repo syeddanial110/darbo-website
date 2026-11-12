@@ -16,9 +16,6 @@ export function SiteHeader({ current, contactHref }: { current: Page; contactHre
         <Link to="/who-we-are" aria-current={current === "who-we-are" ? "page" : undefined}>
           Who we are
         </Link>
-        <Link to="/what-we-do" aria-current={current === "what-we-do" ? "page" : undefined}>
-          What we do
-        </Link>
         <a href={contactHref}>Contact</a>
       </nav>
     </header>

@@ -8,6 +8,9 @@ import wwaCommand from "@/assets/who-we-are/command-center.jpg";
 import wwdHall from "@/assets/what-we-do/workforce-hall.jpg";
 import wwdSkyline from "@/assets/what-we-do/skyline.jpg";
 import wwdDarbo from "@/assets/what-we-do/darbo.png";
+import workThink from "@/assets/what-we-do/s3-hologram.jpg";
+import workHeadless from "@/assets/what-we-do/s4-city.jpg";
+import workPeople from "@/assets/what-we-do/s1-human.jpg";
 
 export const CINEMATIC_ASSETS = {
   darboHuman,
@@ -48,3 +51,6 @@ export const HERO_VIDEO = {
   src: "/videos/hero.mp4",
   poster: "/videos/hero-poster.jpg",
 };
+
+// Full-bleed photo panels for the homepage "work" section.
+export const WORK_IMAGES = { think: workThink, headless: workHeadless, people: workPeople };
