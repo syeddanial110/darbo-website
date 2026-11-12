@@ -8,9 +8,9 @@ import wwaCommand from "@/assets/who-we-are/command-center.jpg";
 import wwdHall from "@/assets/what-we-do/workforce-hall.jpg";
 import wwdSkyline from "@/assets/what-we-do/skyline.jpg";
 import wwdDarbo from "@/assets/what-we-do/darbo.png";
-import workThink from "@/assets/what-we-do/s3-hologram.jpg";
-import workHeadless from "@/assets/what-we-do/s4-city.jpg";
-import workPeople from "@/assets/what-we-do/s1-human.jpg";
+import workThink from "@/assets/work/think.jpg";
+import workHeadless from "@/assets/work/headless.jpg";
+import workPeople from "@/assets/work/people.jpg";
 
 export const CINEMATIC_ASSETS = {
   darboHuman,
